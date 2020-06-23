@@ -17,6 +17,7 @@ scikit-learn = "*"
 gunicorn = "*"
 psycopg2-binary = "*"
 pandas = "*"
+joblib = "*"
 
 [requires]
 python_version = "3.7"
