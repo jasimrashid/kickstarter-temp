@@ -2,7 +2,7 @@
 from flask import Flask, request, jsonify, Blueprint
 import os
 import pickle
-import joblib
+import joblib #TODO: retire this
 import traceback
 import pandas as pd
 import numpy as np
