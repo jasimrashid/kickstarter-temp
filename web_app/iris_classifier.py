@@ -6,11 +6,19 @@ import pickle
 from sklearn.datasets import load_iris
 from sklearn.linear_model import LogisticRegression # for example
 
+import pandas as pd
+
 MODEL_FILEPATH = os.path.join(os.path.dirname(__file__), "..", "models", "latest_model.pkl")
 
 def train_and_save_model():
     print("TRAINING THE MODEL...")
-    X, y = load_iris(return_X_y=True)
+
+    df = pd.read_csv('/Users/jasimrashid/Downloads/test.csv')
+    
+    # X, y = load_iris(return_X_y=True)
+    X = df[['a','b']]
+    y = df['d']
+
     #print(type(X), X.shape) #> <class 'numpy.ndarray'> (150, 4)
     #print(type(y), y.shape) #> <class 'numpy.ndarray'> (150,)
     classifier = LogisticRegression() # for example
@@ -30,17 +38,26 @@ def load_model():
 
 if __name__ == "__main__":
 
-    #train_and_save_model()
-
+    # train_and_save_model()
 
     #exit()
 
     clf = load_model()
     print("CLASSIFIER:", clf)
 
-    X, y = load_iris(return_X_y=True) # just to have some data to use when predicting
-    inputs = X[:2, :]
+    # X, y = load_iris(return_X_y=True) # just to have some data to use when predicting
+    df = pd.read_csv('/Users/jasimrashid/Downloads/test.csv')
+    
+    # X, y = load_iris(return_X_y=True)
+    X = df[['a','b']]
+    y = df['d']
+    # breakpoint()
+    # inputs = X[:2, :]
+    inputs = X.iloc[:2]
+
     print(type(inputs), inputs)
 
     result = clf.predict(inputs)
     print("RESULT:", result)
+
+    breakpoint()

@@ -26,11 +26,38 @@
           </select>
         <br>
 
-        <label>Tweet Text:</label>
+        <label>Tweets Text:</label>
         <input type="text" name="tweet_text" placeholder="Tesla Model S production facility is great" value="Tesla Model S production facility is great">
         <br>
 
+        <label>Category</label>
+        <select name="category">
+            <option value="Software" selected="true">software</option>
+            <option value="Art">art</option>
+            <option value="Cooking">cooking</option>
+            <option value="Electronics">electronics</option>
+        </select>
+        <br>
+
+        <label>Summary of pitch:</label>
+        <input type="text" name="pitch" placeholder="i can make a goose that lays golden eggs. fund me bro!" value="Tesla Model S production facility is great">
+        <br>
+
+
+        <label for="x">x (between 0 and 10):</label>
+        <input type="range" id="x" name="x" min="0" max="10">
+        <br>
+
+        <label for="y">y (between 0 and 100):</label>
+        <input type="range" id="y" name="y" min="0" max="100">
+        <br>
+
+        <label for="z">Volume (between 0 and 50):</label>
+        <input type="range" id="z" name="z" min="0" max="50">
+        <br>
+
         <button>Submit</button>
+
     </form>
 
 {% endblock %}

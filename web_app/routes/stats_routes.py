@@ -6,6 +6,12 @@ from sklearn.linear_model import LogisticRegression
 
 from web_app.models import User
 from web_app.services.basilica_service import connection as basilica_api_client
+import os
+import pickle
+from sklearn.datasets import load_iris
+from pandas import read_csv
+
+MODEL_FILEPATH = os.path.join(os.path.dirname(__file__), "..","..", "models", "latest_model.pkl")
 
 stats_routes = Blueprint("stats_routes", __name__)
 
@@ -13,53 +19,61 @@ stats_routes = Blueprint("stats_routes", __name__)
 def predict():
     print("PREDICT ROUTE...")
     print("FORM DATA:", dict(request.form)) #> {'screen_name_a': 'elonmusk', 'screen_name_b': 's2t2', 'tweet_text': 'Example tweet text here'}
-    screen_name_a = request.form["screen_name_a"]
-    screen_name_b = request.form["screen_name_b"]
-    tweet_text = request.form["tweet_text"]
+    category = request.form["category"]
+    pitch = request.form["pitch"]
+    x = int(request.form["x"])
+    y = int(request.form["y"])
+    z = int(request.form["z"])
 
-    print("-----------------")
-    print("FETCHING TWEETS FROM THE DATABASE...")
-    # h/t: https://flask-sqlalchemy.palletsprojects.com/en/2.x/queries/
-    # get the embeddings (from the database)
-    user_a = User.query.filter_by(screen_name=screen_name_a).first()
-    user_b = User.query.filter_by(screen_name=screen_name_b).first()
-    user_a_tweets = user_a.tweets
-    user_b_tweets = user_b.tweets
-    print("FETCHED TWEETS", len(user_a_tweets), len(user_b_tweets))
-
-    print("-----------------")
-    print("TRAINING THE MODEL...")
-    # X values / inputs: embeddings
-    # Y values / labels: screen_names
-
+    #FOR TESTING PURPOSES ONLY - THE MODEL ONLY USES X AND Y FROM THE FORM
     classifier = LogisticRegression()
-
-    embeddings = []
-    labels = []
-
-    for tweet in user_a_tweets:
-        embeddings.append(tweet.embedding)
-        labels.append(screen_name_a) # tweet.user.screen_name
-
-    for tweet in user_b_tweets:
-        embeddings.append(tweet.embedding)
-        labels.append(screen_name_b) # tweet.user.screen_name
-
-    classifier.fit(embeddings, labels)
-
+    clf = load_model()
+    print("CLASSIFIER:", clf)
+    inputs = [[x, y]]
+    print(type(x))
+    print(type(inputs), inputs)
+    result = clf.predict(inputs)
+    print("RESULT:", result)
     print("-----------------")
     print("MAKING A PREDICTION...")
-    #example_embed_a = user_a_tweets[3].embedding
-    #example_embed_b = user_b_tweets[3].embedding
-    #result = classifier.predict([example_embed_a, example_embed_b])
-
-    embedding = basilica_api_client.embed_sentence(tweet_text, model="twitter")
-
-    result = classifier.predict([embedding])
-
+    
     return render_template("prediction_results.html",
-        screen_name_a=screen_name_a,
-        screen_name_b=screen_name_b,
-        tweet_text=tweet_text,
-        screen_name_most_likely=result[0]
+        x=x,
+        y=y,
+        z=z,
+        category = category,
+        result=result[0]
     )
+
+
+def train_and_save_model():
+    print("TRAINING THE MODEL...")
+    X, y = load_iris(return_X_y=True)
+    classifier = LogisticRegression() # for example
+    classifier.fit(X, y)
+
+    print("SAVING THE MODEL...")
+    with open(MODEL_FILEPATH, "wb") as model_file:
+        pickle.dump(classifier, model_file)
+
+    return classifier
+
+def load_model():
+    print("LOADING THE MODEL...")
+    with open(MODEL_FILEPATH, "rb") as model_file:
+        saved_model = pickle.load(model_file)
+    return saved_model
+
+if __name__ == "__main__":
+
+    train_and_save_model()
+
+    clf = load_model()
+    print("CLASSIFIER:", clf)
+
+    X, y = load_iris(return_X_y=True) # just to have some data to use when predicting
+    inputs = [[1,2]]
+    print(type(inputs), inputs)
+
+    result = clf.predict(inputs)
+    print("RESULT:", result)
